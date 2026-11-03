@@ -1,0 +1,19 @@
+{
+  "name": "postgres-production-labs",
+  "private": true,
+  "description": "Hands-on PostgreSQL production labs for atomicly's SQL course: a slow query, a migration under load, and an idempotent webhook",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "lab": "node lib/lab.mjs",
+    "test": "node lib/run.mjs",
+    "reset": "node lib/reset.mjs",
+    "db": "node lib/db.mjs"
+  },
+  "dependencies": {
+    "pg": "8.23.1"
+  }
+}

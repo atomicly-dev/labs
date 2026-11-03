@@ -8,6 +8,7 @@ The lessons in the browser can't do everything. A lab runs on your machine, agai
 | --- | --- | --- |
 | [postgres-concurrency](postgres-concurrency/) | PostgreSQL, module 13 "Concurrency" | Lost updates, row locks, a job queue, deadlocks, and serialization failures |
 | [postgres-pooling](postgres-pooling/) | PostgreSQL, module 15 "Connection pooling" | A leaked pool client, pool sizes and `max_connections`, and session settings behind PgBouncer |
+| [postgres-production](postgres-production/) | PostgreSQL, modules 16 "Designing and changing a live database" and 17 "Diagnosing production" | Finding a slow query with `pg_stat_statements`, a migration that doesn't block live traffic, and an idempotent payment webhook |
 
 ## What you need
 
