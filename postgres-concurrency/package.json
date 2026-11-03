@@ -1,0 +1,18 @@
+{
+  "name": "postgres-concurrency-labs",
+  "private": true,
+  "description": "Hands-on PostgreSQL concurrency labs for atomicly's SQL course",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node lib/run.mjs",
+    "reset": "node lib/reset.mjs",
+    "db": "node lib/db.mjs"
+  },
+  "dependencies": {
+    "pg": "8.23.1"
+  }
+}
