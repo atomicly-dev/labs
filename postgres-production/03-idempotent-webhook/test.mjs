@@ -1,6 +1,8 @@
 // The payment provider delivers webhook events the way real providers do: some more than once,
 // at the same moment, and some in the wrong order. The test's pool adds 20 ms before each query,
 // like the network between an app and its database, so copies of an event overlap on every run.
+// For one payment, the first delivery loses its connection right after it claims the event, and
+// the provider sends it again.
 
 import pg from "pg";
 import { DATABASE_URL, UNTRACKED, describeError, loadModule, setUp, sleep, within } from "../lib/harness.mjs";
@@ -34,7 +36,9 @@ function eventsFor(orderId, { refund }) {
 const DUPLICATED = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110];
 const LATE_PAYMENT = [111, 112, 113, 114, 115];
 const ALL_AT_ONCE = [116, 117, 118, 119, 120];
-const ORDERS = [...DUPLICATED, ...LATE_PAYMENT, ...ALL_AT_ONCE];
+const CUT_OFF = 121;
+const ORDERS = [...DUPLICATED, ...LATE_PAYMENT, ...ALL_AT_ONCE, CUT_OFF];
+const PAYMENT_ONLY = [...DUPLICATED, CUT_OFF];
 
 export default {
   file: "handler.mjs",
@@ -56,9 +60,10 @@ export default {
       track(new pg.Pool({ connectionString: DATABASE_URL, max: 20, application_name: "lab: app", options: UNTRACKED })),
     );
     const deliveries = [];
-    const deliver = async (event, how) => {
-      const outcome = await within(handlePaymentWebhook(pool, structuredClone(event)), DEADLINE_MS);
+    const deliver = async (event, how, through = pool) => {
+      const outcome = await within(handlePaymentWebhook(through, structuredClone(event)), DEADLINE_MS);
       deliveries.push({ event, how, ...outcome });
+      return outcome;
     };
 
     await Promise.all([
@@ -83,14 +88,20 @@ export default {
     // One more copy of a payment, long after the first.
     await deliver(eventsFor(101, { refund: false }).paid, "again later");
 
-    return check(db, deliveries);
+    // The connection drops after the handler claims the event, before its next query reaches the
+    // database. The provider sees an error and sends the event again.
+    const cutOff = eventsFor(CUT_OFF, { refund: false }).paid;
+    const first = await deliver(cutOff, "cut off", cutAfterClaim(pool));
+    await deliver(cutOff, "retry");
+
+    return check(db, deliveries, first);
   },
 };
 
-async function check(db, deliveries) {
+async function check(db, deliveries, cutOff) {
   const problems = [];
 
-  const failed = deliveries.filter((delivery) => delivery.error || delivery.timedOut);
+  const failed = deliveries.filter((delivery) => delivery.how !== "cut off" && (delivery.error || delivery.timedOut));
   if (failed.length) {
     const first = failed[0];
     const how = first.timedOut
@@ -103,7 +114,7 @@ async function check(db, deliveries) {
   }
 
   const { rows: ledger } = await db.query(
-    "SELECT order_id, event_id, count(*)::int AS rows FROM payments WHERE order_id = ANY ($1) GROUP BY order_id, event_id",
+    "SELECT order_id, event_id, amount::float8 AS amount FROM payments WHERE order_id = ANY ($1) ORDER BY id",
     [ORDERS],
   );
   const { rows: orders } = await db.query(
@@ -113,15 +124,21 @@ async function check(db, deliveries) {
 
   const charged = [];
   const missing = [];
+  const misbooked = [];
+  const expectedIds = new Set();
   for (const orderId of ORDERS) {
-    const refund = !DUPLICATED.includes(orderId);
-    const events = Object.values(eventsFor(orderId, { refund }));
-    for (const event of events) {
-      const rows = ledger.find((row) => row.event_id === event.id)?.rows ?? 0;
-      if (rows > 1) charged.push({ orderId, event, rows });
-      if (rows === 0) missing.push({ orderId, event });
+    const refund = !PAYMENT_ONLY.includes(orderId);
+    for (const event of Object.values(eventsFor(orderId, { refund }))) {
+      expectedIds.add(event.id);
+      const rows = ledger.filter((row) => row.event_id === event.id);
+      if (rows.length > 1) charged.push({ orderId, event, rows: rows.length });
+      if (rows.length === 0) missing.push({ orderId, event });
+      const amount = event.type === "payment.refunded" ? -event.amount : event.amount;
+      const wrongRow = rows.find((row) => row.order_id !== orderId || row.amount !== amount);
+      if (wrongRow) misbooked.push({ orderId, event, amount, row: wrongRow });
     }
   }
+  const extra = ledger.filter((row) => !expectedIds.has(row.event_id));
   if (charged.length) {
     const { orderId, event, rows } = charged[0];
     problems.push(
@@ -129,12 +146,35 @@ async function check(db, deliveries) {
         `Order ${orderId} has ${rows} rows for ${event.id} (${event.type}), so the shop counts that money ${rows} times.`,
     );
   }
-  if (missing.length && !failed.length) {
-    const { orderId, event } = missing[0];
-    problems.push(`${missing.length} events never reached the ledger. Order ${orderId} has no row for ${event.id}.`);
+  if (misbooked.length) {
+    const { orderId, event, amount, row } = misbooked[0];
+    problems.push(
+      `${misbooked.length} ledger rows have the wrong order or amount. ${event.id} (${event.type}) should add ` +
+        `${amount} to order ${orderId}, and its row adds ${row.amount} to order ${row.order_id}.`,
+    );
+  }
+  if (extra.length) {
+    const row = extra[0];
+    problems.push(
+      `The payments ledger has ${extra.length} rows that no event sent. Order ${row.order_id} has a row of ` +
+        `${row.amount} with event_id ${row.event_id}.`,
+    );
+  }
+  const cutOffMissing = missing.find((item) => item.orderId === CUT_OFF);
+  if (cutOffMissing && cutOff.error) {
+    problems.push(
+      `The first delivery of ${cutOffMissing.event.id} lost its connection right after it claimed the event, ` +
+        `and the retry skipped the event, so its payment never reached the ledger. The claim was saved without ` +
+        `the changes it stands for.`,
+    );
+  }
+  const otherMissing = missing.filter((item) => item !== cutOffMissing || !cutOff.error);
+  if (otherMissing.length && !failed.length) {
+    const { orderId, event } = otherMissing[0];
+    problems.push(`${otherMissing.length} events never reached the ledger. Order ${orderId} has no row for ${event.id}.`);
   }
 
-  const wrong = orders.filter((order) => order.payment_status !== (DUPLICATED.includes(order.id) ? "paid" : "refunded"));
+  const wrong = orders.filter((order) => order.payment_status !== (PAYMENT_ONLY.includes(order.id) ? "paid" : "refunded"));
   const late = wrong.filter((order) => LATE_PAYMENT.includes(order.id));
   if (late.length) {
     const { paid, refunded } = eventsFor(late[0].id, { refund: true });
@@ -146,7 +186,7 @@ async function check(db, deliveries) {
   const others = wrong.filter((order) => !LATE_PAYMENT.includes(order.id));
   if (others.length) {
     const order = others[0];
-    const want = DUPLICATED.includes(order.id) ? "paid" : "refunded";
+    const want = PAYMENT_ONLY.includes(order.id) ? "paid" : "refunded";
     problems.push(
       `${others.length === 1 ? "An order" : `${others.length} orders`} ended with the wrong payment_status. ` +
         `Order ${order.id}'s is ${order.payment_status ?? "NULL"}, and it should be ${want}.`,
@@ -157,6 +197,40 @@ async function check(db, deliveries) {
 
 function time(iso) {
   return iso.slice(11, 16);
+}
+
+// Wraps the latency pool for one delivery. After the first query that mentions webhook_events,
+// the connection drops before the next query reaches the database, as when the network fails.
+// PostgreSQL then rolls back the connection's open transaction, if it has one. A COMMIT or
+// ROLLBACK right after the claim goes through, so a handler that claims and applies the event in
+// one statement isn't cut off.
+function cutAfterClaim(pool) {
+  let claimed = false;
+  let cut = false;
+  const guarded = (target, drop) => async (...args) => {
+    const text = typeof args[0] === "string" ? args[0] : (args[0]?.text ?? "");
+    if (claimed && !cut && !/^\s*(COMMIT|ROLLBACK|END)\b/i.test(text)) {
+      cut = true;
+      drop();
+      throw new Error("Connection terminated unexpectedly");
+    }
+    if (/webhook_events/i.test(text)) claimed = true;
+    return target.query(...args);
+  };
+  return {
+    query: guarded(pool, () => {}),
+    async connect() {
+      const client = await pool.connect();
+      const query = guarded(client, () => client.connection.stream.destroy());
+      return new Proxy(client, {
+        get(target, prop) {
+          if (prop === "query") return query;
+          const value = Reflect.get(target, prop);
+          return typeof value === "function" ? value.bind(target) : value;
+        },
+      });
+    },
+  };
 }
 
 // Wraps the pool, so each query, from pool.query() or from a client of pool.connect(), starts

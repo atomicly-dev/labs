@@ -17,10 +17,15 @@ export default {
   async run({ app, db, track }) {
     const expected = new Map();
     for (const customerId of CUSTOMERS) {
-      const { rows } = await db.query("SELECT count(*)::int AS n FROM orders WHERE customer_id = $1", [
-        customerId,
-      ]);
-      expected.set(customerId, rows[0].n);
+      const { rows } = await db.query(
+        `SELECT (SELECT count(*) FROM orders WHERE customer_id = $1)::int AS order_count,
+                (SELECT coalesce(sum(oi.quantity * oi.unit_price), 0)
+                   FROM order_items AS oi
+                   JOIN orders AS o ON o.id = oi.order_id
+                  WHERE o.customer_id = $1)::text AS total_spent`,
+        [customerId],
+      );
+      expected.set(customerId, rows[0]);
     }
 
     const pools = Array.from({ length: INSTANCES }, () => track(app.createPool()));
@@ -43,8 +48,9 @@ export default {
         ? `didn't finish within ${DEADLINE_MS / 1000} seconds`
         : outcome.error
           ? `failed with ${describeError(outcome.error)}`
-          : outcome.value?.order_count !== expected.get(outcome.customerId)
-            ? `returned the wrong summary: ${JSON.stringify(outcome.value)}`
+          : !sameSummary(outcome.value, expected.get(outcome.customerId))
+            ? `returned the wrong summary for customer ${outcome.customerId}: ${JSON.stringify(outcome.value)}, ` +
+              `and it should be ${JSON.stringify(expected.get(outcome.customerId))}`
             : null;
       if (reason) failures.set(reason, (failures.get(reason) ?? 0) + 1);
     }
@@ -52,7 +58,7 @@ export default {
       problems.push(`${count} of ${total} requests ${reason}.`);
     }
 
-    if (problems.length) {
+    if (outcomes.some((outcome) => outcome.error || outcome.timedOut)) {
       const direct = pools.filter((pool) => !usesPgBouncer(pool)).map((pool) => pool.options.max);
       const sum = direct.reduce((a, b) => a + b, 0);
       if (direct.length) {
@@ -68,6 +74,15 @@ export default {
     return problems;
   },
 };
+
+// The order count must match, and the total spent too, as a number: 120.5 and "120.50" are the same.
+function sameSummary(value, expected) {
+  return (
+    value?.order_count === expected.order_count &&
+    value?.total_spent != null &&
+    Number(value.total_spent) === Number(expected.total_spent)
+  );
+}
 
 function usesPgBouncer(pool) {
   const url = pool.options.connectionString;

@@ -24,7 +24,7 @@ A pool opens connections as requests need them, up to its `max`. 4 pools with 10
 npm run lab -- 02
 ```
 
-The test calls `createPool` 4 times, once per instance, and sends 10 requests to each pool at the same time. Each request holds its connection for about 200 ms. Every request should succeed.
+The test calls `createPool` 4 times, once per instance, and sends 10 requests to each pool at the same time. Each request holds its connection for about 200 ms. Every request should succeed, and return the customer's order count and total spent.
 
 ## Hint
 

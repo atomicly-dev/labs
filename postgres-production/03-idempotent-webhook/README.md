@@ -25,15 +25,16 @@ And the handler sets `payment_status` from whichever event arrives last. When th
 npm run lab -- 03
 ```
 
-The test calls `handlePaymentWebhook` with a `pg` pool, the way the route does, for 20 orders:
+The test calls `handlePaymentWebhook` with a `pg` pool, the way the route does, for 21 orders:
 
 - 10 payments, each delivered 3 times at the same moment.
 - 5 refunds, each followed by its payment, which arrives late.
 - 5 payments and refunds, each delivered twice, all 4 at the same moment.
+- 1 payment whose first delivery loses its connection right after the handler records the event's id, and before its next query. The provider sends it again.
 
 The test's pool adds 20 ms before each query, like the network between an app and its database, so the copies of an event overlap on every run.
 
-The lab passes when every delivery returns without an error, each event is in the ledger exactly once, and each order ends with the status of its newest event: `paid`, or `refunded` when there was a refund.
+The lab passes when every delivery returns without an error, except the one that loses its connection, and each event is in the ledger exactly once, for its order and with its amount: the payment's amount, or minus the amount for a refund. Each order also ends with the status of its newest event: `paid`, or `refunded` when there was a refund.
 
 ## Hint
 
