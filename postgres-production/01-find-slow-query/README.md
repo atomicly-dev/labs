@@ -1,6 +1,6 @@
 # Lab 01: Find the slow query
 
-Lesson: [The slow-query workflow](https://atomicly.dev/lessons/slow-query-workflow)
+Lesson: [Finding and fixing slow queries](https://atomicly.dev/lessons/slow-query-workflow)
 
 ## The situation
 

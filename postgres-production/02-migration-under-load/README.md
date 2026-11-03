@@ -1,6 +1,6 @@
 # Lab 02: Migration under load
 
-Lesson: [Zero-downtime migrations](https://atomicly.dev/lessons/zero-downtime-migrations)
+Lesson: [Migrations without downtime](https://atomicly.dev/lessons/zero-downtime-migrations)
 
 ## The situation
 

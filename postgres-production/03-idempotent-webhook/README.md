@@ -1,6 +1,6 @@
 # Lab 03: Idempotent webhook
 
-Lesson: [Idempotency](https://atomicly.dev/lessons/idempotency)
+Lesson: [Idempotent writes](https://atomicly.dev/lessons/idempotency)
 
 ## The situation
 
