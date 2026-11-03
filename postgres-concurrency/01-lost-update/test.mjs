@@ -8,6 +8,7 @@ const ORDER_IDS = [101, 102, 103];
 
 export default {
   file: "checkout.sql",
+  lesson: "https://atomicly.dev/lessons/lost-updates",
   setup: `
     DELETE FROM order_items WHERE order_id BETWEEN 100 AND 199;
     DELETE FROM orders WHERE id BETWEEN 100 AND 199;

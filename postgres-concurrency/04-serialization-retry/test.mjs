@@ -8,6 +8,7 @@ const ORDER_IDS = [401, 402];
 
 export default {
   file: "redeem.sql",
+  lesson: "https://atomicly.dev/lessons/isolation-levels",
   setup: `
     DELETE FROM coupon_redemptions WHERE coupon_code = 'LAUNCH10' OR order_id BETWEEN 400 AND 499;
     DELETE FROM orders WHERE id BETWEEN 400 AND 499;

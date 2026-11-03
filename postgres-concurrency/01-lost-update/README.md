@@ -21,7 +21,7 @@ All three checkouts read the stock before any of them saves it. Each one reads 2
 Two checkouts sell a Monitor, the third sells nothing, and the stock ends at 0. Stock never goes below 0, and every sale comes off the stock.
 
 ```sh
-npm test -- 01-lost-update
+npm run lab -- 01
 ```
 
 The test runs `checkout.sql` in 3 sessions with `:product_id` 3 (the Monitor), `:quantity` 1, and `:order_id` 101, 102, and 103.

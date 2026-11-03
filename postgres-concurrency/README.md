@@ -26,6 +26,7 @@ The database keeps its data in memory. `docker compose down` stops it and throws
 
 | Command | What it does |
 | --- | --- |
+| `npm run lab -- 01` | Runs one lab, start to finish: starts the database if it isn't running, runs the lab, and tells you what to do next. Start here. |
 | `npm test` | Runs every lab. |
 | `npm test -- 01-lost-update` | Runs one lab. `npm test -- 01` works too. |
 | `npm test -- 01 --repeat 20` | Runs a lab 20 times, to check that your fix holds every time. |

@@ -20,7 +20,7 @@ Both transactions read the count before either one inserts, so both see 1 use le
 One of the two orders gets the coupon, and `LAUNCH10` ends with 3 uses.
 
 ```sh
-npm test -- 04-serialization-retry
+npm run lab -- 04
 ```
 
 The test runs `redeem.sql` in 2 sessions with `:coupon_code` `'LAUNCH10'` and `:order_id` 401 and 402. When a session fails with error 40001, the test runs the whole file again in that session, the way your app's retry loop should.

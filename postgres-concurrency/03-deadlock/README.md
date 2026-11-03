@@ -22,7 +22,7 @@ PostgreSQL checks for a deadlock after a session has waited `deadlock_timeout`, 
 Both transfers finish with no error. Ana ends with 45.00 and Ben with 55.00.
 
 ```sh
-npm test -- 03-deadlock
+npm run lab -- 03
 ```
 
 The test runs `transfer.sql` in 2 sessions: one with `:from_id` 1, `:to_id` 2, and `:amount` 10, and one with `:from_id` 2, `:to_id` 1, and `:amount` 5.

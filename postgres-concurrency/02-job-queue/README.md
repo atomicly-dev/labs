@@ -21,7 +21,7 @@ All four workers read the queue at the same moment, and each one picks job 1. No
 Each of the four workers takes a different job, each job runs once, and no worker waits for a lock that another worker holds.
 
 ```sh
-npm test -- 02-job-queue
+npm run lab -- 02
 ```
 
 The test runs `claim.sql` in 4 sessions with `:worker` set to `'worker-1'` through `'worker-4'`. There are 6 queued jobs.

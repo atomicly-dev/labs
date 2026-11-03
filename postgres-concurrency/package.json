@@ -8,6 +8,7 @@
     "node": ">=24"
   },
   "scripts": {
+    "lab": "node lib/lab.mjs",
     "test": "node lib/run.mjs",
     "reset": "node lib/reset.mjs",
     "db": "node lib/db.mjs"
