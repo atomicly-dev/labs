@@ -1,0 +1,114 @@
+// A copy of service.mjs with one bug: the byte limit is gone. The lab runs your suite against
+// this file, and your suite should fail. Try the lab before you read it.
+
+import http from "node:http";
+import { pipeline } from "node:stream/promises";
+
+const TRY_TIMEOUT_MS = 500;
+const MAX_TRIES = 3;
+
+class BodyTooLarge extends Error {}
+
+export function createService({ storage, taxUrl, maxBytes = 10_000_000, deadlineMs = 1500, maxInFlight = 4 }) {
+  let inFlight = 0;
+
+  return http.createServer(async (req, res) => {
+    const url = new URL(req.url, "http://receipts");
+    const id = /^\/receipts\/([\w-]+)$/.exec(url.pathname)?.[1];
+    if (req.method === "GET" && id) return download(storage, id, res);
+    if (req.method !== "PUT" || !id) return sendJson(res, 404, { error: "Not found" });
+
+    if (inFlight >= maxInFlight) {
+      res.setHeader("Retry-After", "1");
+      return sendJson(res, 503, { error: "Server busy" });
+    }
+    inFlight++;
+    const signal = requestSignal(res, deadlineMs);
+    try {
+      let bytes = 0;
+      async function* limitBytes(chunks) {
+        for await (const chunk of chunks) {
+          bytes += chunk.length;
+          yield chunk;
+        }
+      }
+      await pipeline(req, limitBytes, storage.createWriteStream(id), { signal });
+      const receipt = { id, total: Number(url.searchParams.get("total")), country: url.searchParams.get("country") };
+      const vat = await getVat(taxUrl, receipt, signal);
+      sendJson(res, 201, { id, bytes, vat });
+    } catch (error) {
+      if (error instanceof BodyTooLarge) {
+        sendJson(res, 413, { error: "Body too large" });
+      } else if (signal.reason?.name === "TimeoutError") {
+        sendJson(res, 503, { error: "Timed out" });
+      } else if (!signal.aborted && error.code !== "ECONNRESET") {
+        sendJson(res, 502, { error: "Tax API failed" });
+      } // else the client left, so there's nobody to answer
+    } finally {
+      inFlight--;
+    }
+  });
+}
+
+async function download(storage, id, res) {
+  let file;
+  try {
+    file = storage.createReadStream(id);
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    return sendJson(res, 404, { error: "Not found" });
+  }
+  res.setHeader("content-type", "application/octet-stream");
+  await pipeline(file, res).catch(() => {});
+}
+
+function requestSignal(res, ms) {
+  const clientLeft = new AbortController();
+  res.on("close", () => {
+    if (!res.writableFinished) clientLeft.abort();
+  });
+  return AbortSignal.any([clientLeft.signal, AbortSignal.timeout(ms)]);
+}
+
+async function getVat(taxUrl, receipt, signal) {
+  for (let attempt = 1; ; attempt++) {
+    let response = null;
+    try {
+      response = await fetch(`${taxUrl}/vat`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(receipt),
+        signal: AbortSignal.any([signal, AbortSignal.timeout(TRY_TIMEOUT_MS)]),
+      });
+    } catch (error) {
+      if (signal.aborted) throw error;
+    }
+    if (response?.ok) return (await response.json()).vat;
+    await response?.body?.cancel().catch(() => {});
+    if ((response && response.status < 500) || attempt === MAX_TRIES) {
+      throw new Error(`Tax API failed: ${response ? response.status : "no response"}`);
+    }
+    await sleep(100 * attempt, signal);
+  }
+}
+
+function sleep(ms, signal) {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) return reject(signal.reason);
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(signal.reason);
+    };
+    const timer = setTimeout(() => {
+      signal.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
+function sendJson(res, status, body) {
+  if (res.destroyed) return;
+  res.writeHead(status, { "content-type": "application/json" });
+  res.end(JSON.stringify(body));
+}
