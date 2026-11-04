@@ -1,0 +1,15 @@
+{
+  "name": "js-production-labs",
+  "private": true,
+  "description": "Hands-on JavaScript labs for atomicly's JavaScript course: a paged import with a concurrency limit and timeouts, a search box that cancels old requests, and a worker that leaks memory",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "lab": "node lib/lab.mjs",
+    "test": "node lib/run.mjs",
+    "snapshots": "node 03-memory-leak/snapshots.mjs"
+  }
+}
