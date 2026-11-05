@@ -1,6 +1,6 @@
 # Lab 02: Read your own write
 
-Goes with module 2 of the System Design course, "Consistency and failure", on replication.
+Lessons: [Consistency models: explain a disappearing update](https://atomicly.dev/lessons/sd-consistency-models) and [Replication and failover: find the last durable write](https://atomicly.dev/lessons/sd-replication-failover).
 
 ## The situation
 

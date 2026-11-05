@@ -1,6 +1,6 @@
 # Lab 06: A limit across replicas
 
-Goes with module 7 of the System Design course, "Bounding failure", on rate limiting.
+Lesson: [Rate limiting: share a budget across replicas](https://atomicly.dev/lessons/sd-rate-limiting).
 
 ## The situation
 

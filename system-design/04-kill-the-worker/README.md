@@ -1,6 +1,6 @@
 # Lab 04: Kill the worker
 
-Lessons: [Row locks](https://atomicly.dev/lessons/row-locks) (section 4, *SKIP LOCKED for a job queue*) and [Idempotent writes](https://atomicly.dev/lessons/idempotency)
+Lessons: [Row locks](https://atomicly.dev/lessons/row-locks) (section 4, *SKIP LOCKED for a job queue*) and [Idempotent writes](https://atomicly.dev/lessons/idempotency), and [Message queues: acknowledge after the effect](https://atomicly.dev/lessons/sd-message-queues)
 
 ## The situation
 

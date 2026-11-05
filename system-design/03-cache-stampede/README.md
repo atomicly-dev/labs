@@ -1,6 +1,6 @@
 # Lab 03: Cache stampede
 
-Goes with module 5 of the System Design course, "Caching".
+Lesson: [Cache stampede: a hot miss can overload the origin](https://atomicly.dev/lessons/sd-cache-stampede).
 
 ## The situation
 
