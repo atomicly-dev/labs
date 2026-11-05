@@ -1,0 +1,21 @@
+{
+  "name": "system-design-labs",
+  "private": true,
+  "description": "Hands-on System Design labs for atomicly: a bottleneck under load, a stale read from a replica, a cache stampede, a killed worker, a retry storm, and a rate limit across replicas",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "lab": "node lib/lab.mjs",
+    "test": "node lib/run.mjs",
+    "load": "node lib/load.mjs",
+    "scale": "node lib/scale.mjs",
+    "db": "node lib/db.mjs"
+  },
+  "dependencies": {
+    "pg": "8.23.1",
+    "redis": "6.3.0"
+  }
+}

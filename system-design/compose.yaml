@@ -1,0 +1,142 @@
+name: atomicly-labs-system-design
+
+# Every service keeps its data in memory, so `docker compose down` throws it away, and the next
+# `up` starts from the seed again. Run `npm install` before `up`: the API containers run this
+# folder's code with its node_modules.
+
+x-postgres: &postgres
+  image: postgres:18.6-alpine
+  environment:
+    POSTGRES_DB: shop
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+  tmpfs:
+    - /var/lib/postgresql
+  healthcheck:
+    test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "postgres", "-d", "shop"]
+    interval: 1s
+    timeout: 3s
+    retries: 60
+
+services:
+  # Lab 01's database. A small max_connections, so the API instances' pools run out of
+  # connections. 3 of the 20 are for superusers, so the app's role gets 17.
+  postgres:
+    <<: *postgres
+    command: ["postgres", "-c", "max_connections=20", "-c", "shared_buffers=32MB"]
+    ports:
+      - "127.0.0.1:5443:5432"
+    volumes:
+      - ./postgres/seed.sql:/docker-entrypoint-initdb.d/01-seed.sql:ro
+
+  # The API, for labs 01 and 06. Each container is one instance. It runs the server.mjs of the
+  # lab in LAB. The tests set LAB and LAB_FILE, and scale the instances, with `compose up`.
+  api:
+    image: node:24.22.2-alpine
+    scale: 2
+    working_dir: /labs
+    command: ["node", "${LAB:-01-find-the-bottleneck}/server.mjs"]
+    environment:
+      LAB_FILE: ${LAB_FILE:-}
+      DATABASE_URL: postgres://shop_app:shop_app@postgres:5432/shop
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - .:/labs:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  # The load balancer in front of the API instances. See nginx/default.conf.template.
+  nginx:
+    image: nginx:1.30.6-alpine
+    environment:
+      NGINX_ENTRYPOINT_LOCAL_RESOLVERS: "1"
+    ports:
+      - "127.0.0.1:8090:80"
+    volumes:
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/nginx-health"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  # Labs 02 to 04's database: a primary, and a replica that streams its changes. The replica
+  # waits 2 seconds before it applies each transaction (recovery_min_apply_delay), so its lag
+  # always shows. A real replica lags by milliseconds to minutes, depending on load.
+  primary:
+    <<: *postgres
+    command: ["postgres", "-c", "shared_buffers=32MB"]
+    ports:
+      - "127.0.0.1:5444:5432"
+    volumes:
+      - ./postgres/seed.sql:/docker-entrypoint-initdb.d/01-seed.sql:ro
+      - ./postgres/primary-init.sh:/docker-entrypoint-initdb.d/02-replication.sh:ro
+
+  replica:
+    <<: *postgres
+    entrypoint: ["sh", "/replica.sh"]
+    command: ["postgres", "-c", "shared_buffers=32MB", "-c", "recovery_min_apply_delay=2s"]
+    ports:
+      - "127.0.0.1:5445:5432"
+    volumes:
+      - ./postgres/replica.sh:/replica.sh:ro
+    depends_on:
+      primary:
+        condition: service_healthy
+
+  # Labs 03 and 06's cache and shared counters.
+  redis:
+    image: redis:8.10.3-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "127.0.0.1:6390:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  # Lab 05's slow dependency: the inventory service. It counts every call it gets.
+  inventory:
+    image: node:24.22.2-alpine
+    working_dir: /labs
+    command: ["node", "lib/inventory.mjs"]
+    ports:
+      - "127.0.0.1:8091:3000"
+    volumes:
+      - .:/labs:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  # Toxiproxy sits between lab 05's service and the inventory service, and slows or breaks the
+  # connection on command. Its API is on port 8475, and the proxy on 8666.
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.13.0
+    command: ["-host=0.0.0.0", "-config=/toxiproxy.json"]
+    ports:
+      - "127.0.0.1:8475:8474"
+      - "127.0.0.1:8666:8666"
+    volumes:
+      - ./lib/toxiproxy.json:/toxiproxy.json:ro
+    depends_on:
+      inventory:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/toxiproxy-cli", "list"]
+      interval: 1s
+      timeout: 3s
+      retries: 30

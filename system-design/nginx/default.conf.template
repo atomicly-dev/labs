@@ -1,0 +1,26 @@
+# The load balancer in front of the API instances. `docker compose up --scale api=4` starts more
+# instances. nginx asks Docker's or Podman's DNS for the address of every `api` container each
+# second, so it sends traffic to new instances without a restart. Requests take turns: the first to
+# one instance, the next to the next one (round robin).
+
+resolver ${NGINX_LOCAL_RESOLVERS} valid=1s ipv6=off;
+
+upstream api {
+    zone api 64k;
+    server api:3000 resolve;
+}
+
+server {
+    listen 80;
+
+    location = /nginx-health {
+        return 200 "ok\n";
+    }
+
+    location / {
+        proxy_pass http://api;
+        # Send each request once. If an instance fails, the client sees the error.
+        proxy_next_upstream off;
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
+}

@@ -174,3 +174,39 @@ jobs:
               exit 1
             fi
           done
+
+  system-design:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: system-design
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: system-design/package-lock.json
+      # The API containers run this folder's code with its node_modules, so npm ci comes first.
+      - run: npm ci
+      - run: docker compose up -d --wait
+      - name: Every solution passes
+        run: npm test -- --solution --repeat 20
+      # The test exits with 1 when a lab fails, and with 2 when it can't run at all, so a starter
+      # must exit with 1 and fail all 20 runs.
+      - name: Every starter fails
+        run: |
+          for dir in [0-9][0-9]-*/; do
+            lab="${dir%/}"
+            set +e
+            output="$(npm test -- "$lab" --repeat 20 2>&1)"
+            code=$?
+            set -e
+            echo "$output"
+            if [ "$code" -ne 1 ] || ! grep -q " 0/20 runs passed" <<<"$output"; then
+              echo "::error::The starter of $lab should fail on every run."
+              exit 1
+            fi
+          done
+      - if: failure()
+        run: docker compose logs
