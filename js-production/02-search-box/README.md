@@ -1,6 +1,6 @@
 # Lab 02: Search box
 
-Lessons: [Cancel work you no longer need](https://atomicly.dev/lessons/cancellation) and [Timeouts that clean up](https://atomicly.dev/lessons/timeouts)
+Lessons: [Cancel work you no longer need](https://atomicly.dev/lessons/js-cancellation) and [Timeouts that clean up](https://atomicly.dev/lessons/js-timeouts)
 
 ## The situation
 
@@ -42,7 +42,7 @@ The lab passes when:
 
 ## Hints
 
-- **The slower response wins.** Section 1 of [Cancel work you no longer need](https://atomicly.dev/lessons/cancellation), *The slower response wins*, shows this exact bug, and section 2, *Ignore a response that's out of date*, shows why ignoring the old response isn't enough here.
+- **The slower response wins.** Section 1 of [Cancel work you no longer need](https://atomicly.dev/lessons/js-cancellation), *The slower response wins*, shows this exact bug, and section 2, *Ignore a response that's out of date*, shows why ignoring the old response isn't enough here.
 - **Stop the old request.** Section 3, *Abort the search you replaced*, shows an `AbortController` for each search, and what to do with the `AbortError` it causes. `destroy()` can use the same controller.
-- **A timeout that stops the request.** Section 3 of [Timeouts that clean up](https://atomicly.dev/lessons/timeouts), *AbortSignal.timeout stops the work*, shows a signal that aborts after a time limit. Section 4, *Tell a timeout from a cancel*, shows how to combine it with your controller's signal, and how to tell the two apart: one is worth an error message, and the other isn't.
-- **An error with no handler.** If you let an `AbortError` escape `search`, the page's promise rejects with no handler. [Errors in async code](https://atomicly.dev/lessons/async-errors), section 1, *A rejection nobody handles stops the server*, shows what that does.
+- **A timeout that stops the request.** Section 3 of [Timeouts that clean up](https://atomicly.dev/lessons/js-timeouts), *AbortSignal.timeout stops the work*, shows a signal that aborts after a time limit. Section 4, *Tell a timeout from a cancel*, shows how to combine it with your controller's signal, and how to tell the two apart: one is worth an error message, and the other isn't.
+- **An error with no handler.** If you let an `AbortError` escape `search`, the page's promise rejects with no handler. [Errors in async code](https://atomicly.dev/lessons/js-async-errors), section 1, *A rejection nobody handles stops the server*, shows what that does.

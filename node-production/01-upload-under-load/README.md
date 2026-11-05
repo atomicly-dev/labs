@@ -1,6 +1,6 @@
 # Lab 01: Upload under load
 
-Lessons: [Bounded request handling](https://atomicly.dev/lessons/request-limits), [Streaming across HTTP](https://atomicly.dev/lessons/streaming-http), and [Call an API with fetch](https://atomicly.dev/lessons/fetch-api-calls)
+Lessons: [Bounded request handling](https://atomicly.dev/lessons/node-request-limits), [Streaming across HTTP](https://atomicly.dev/lessons/node-streaming-http), and [Call an API with fetch](https://atomicly.dev/lessons/node-fetch-api-calls)
 
 ## The situation
 
@@ -48,8 +48,8 @@ The test starts the service in a process of its own, with fake storage that take
 
 ## Hints
 
-- **Stream the upload.** Section 1 of [Streaming across HTTP](https://atomicly.dev/lessons/streaming-http), *Stream an upload into storage*, shows `pipeline` from `req` into a storage stream, with an async generator that counts the bytes and throws past the limit. When it throws, `pipeline` destroys the storage stream, so storage discards the file.
-- **One deadline for the whole request.** Section 1 of [Bounded request handling](https://atomicly.dev/lessons/request-limits), *One deadline for the whole request*, shows one signal for the body read and every try, with `AbortSignal.any` to give each try its own 500 ms. `pipeline` takes the signal in its options, as section 3 of Streaming across HTTP shows. Section 4 of [Call an API with fetch](https://atomicly.dev/lessons/fetch-api-calls), *Retry within a budget*, shows why the retries need that budget too.
+- **Stream the upload.** Section 1 of [Streaming across HTTP](https://atomicly.dev/lessons/node-streaming-http), *Stream an upload into storage*, shows `pipeline` from `req` into a storage stream, with an async generator that counts the bytes and throws past the limit. When it throws, `pipeline` destroys the storage stream, so storage discards the file.
+- **One deadline for the whole request.** Section 1 of [Bounded request handling](https://atomicly.dev/lessons/node-request-limits), *One deadline for the whole request*, shows one signal for the body read and every try, with `AbortSignal.any` to give each try its own 500 ms. `pipeline` takes the signal in its options, as section 3 of Streaming across HTTP shows. Section 4 of [Call an API with fetch](https://atomicly.dev/lessons/node-fetch-api-calls), *Retry within a budget*, shows why the retries need that budget too.
 - **Stop when the client leaves.** Section 2 of Bounded request handling, *Stop when the client leaves*, shows why `req`'s `close` event is the wrong one, and how `res`'s `close` with `res.writableFinished` aborts a controller. Combine it with the deadline, and pass the one signal to every step, the sleep between tries too.
 - **Tell a timeout from a client that left.** The same section shows how: `signal.reason.name` is `"TimeoutError"` when the deadline passed, and the client still waits for its `503`. A client that left gets no answer.
 - **Turn away what you can't serve.** Section 3, *Turn away what you can't serve*, shows a count of the requests in progress, and a `503` with `Retry-After` past the limit. Count down when the handler finishes, not when `res` closes.

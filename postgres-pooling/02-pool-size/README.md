@@ -1,6 +1,6 @@
 # Lab 02: Pool size
 
-Lesson: [Connections and pools](https://atomicly.dev/lessons/connections-and-pools)
+Lesson: [Connections and pools](https://atomicly.dev/lessons/psql-connections-and-pools)
 
 ## The situation
 

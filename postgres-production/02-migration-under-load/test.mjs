@@ -26,7 +26,7 @@ const APP_CONNECTIONS = 4;
 
 export default {
   file: "migration.sql",
-  lesson: "https://atomicly.dev/lessons/zero-downtime-migrations",
+  lesson: "https://atomicly.dev/lessons/psql-zero-downtime-migrations",
 
   async run({ file, db, connect, track }) {
     const read = await readSqlFile(file);

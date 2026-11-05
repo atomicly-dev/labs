@@ -1,6 +1,6 @@
 # Lab 01: Lost update
 
-Lesson: [Lost updates](https://atomicly.dev/lessons/lost-updates)
+Lesson: [Lost updates](https://atomicly.dev/lessons/psql-lost-updates)
 
 ## The situation
 

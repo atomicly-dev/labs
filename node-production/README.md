@@ -6,8 +6,8 @@ All 3 labs use one small service, `receipts-service`. The mobile app uploads pho
 
 | Lab | Goal | You edit | Lesson |
 | --- | --- | --- | --- |
-| [01-upload-under-load](01-upload-under-load/) | The service runs out of memory at the end of the month, and keeps working for clients that left. Stream the upload with a byte limit, give each request one deadline, stop when the client leaves, and turn away what it can't serve. | `service.mjs` | [Bounded request handling](https://atomicly.dev/lessons/request-limits) |
-| [02-shutdown-and-context](02-shutdown-and-context/) | Deploys drop uploads and ledger entries, and the logs can't connect a failed upload to its tax call. Shut down in order under one deadline, and carry the request ID and the trace through every log line and call. | `service.mjs` | [Shutdown under traffic](https://atomicly.dev/lessons/shutdown-under-load) |
+| [01-upload-under-load](01-upload-under-load/) | The service runs out of memory at the end of the month, and keeps working for clients that left. Stream the upload with a byte limit, give each request one deadline, stop when the client leaves, and turn away what it can't serve. | `service.mjs` | [Bounded request handling](https://atomicly.dev/lessons/node-request-limits) |
+| [02-shutdown-and-context](02-shutdown-and-context/) | Deploys drop uploads and ledger entries, and the logs can't connect a failed upload to its tax call. Shut down in order under one deadline, and carry the request ID and the trace through every log line and call. | `service.mjs` | [Shutdown under traffic](https://atomicly.dev/lessons/node-shutdown-under-load) |
 | [03-test-suite](03-test-suite/) | A broken byte limit went out, and nothing in CI failed. Write the `node:test` suite that catches it, and two other bugs, and leaves nothing open. | `receipts.test.mjs` | [node:test and assert](https://atomicly.dev/lessons/node-test) |
 
 ## Start

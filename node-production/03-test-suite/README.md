@@ -1,6 +1,6 @@
 # Lab 03: An integration test suite
 
-Lessons: [node:test and assert](https://atomicly.dev/lessons/node-test), [Mocks and fake timers](https://atomicly.dev/lessons/mocks-and-timers), and [Bounded request handling](https://atomicly.dev/lessons/request-limits)
+Lessons: [node:test and assert](https://atomicly.dev/lessons/node-test), [Mocks and fake timers](https://atomicly.dev/lessons/node-mocks-and-timers), and [Bounded request handling](https://atomicly.dev/lessons/node-request-limits)
 
 ## The situation
 
@@ -44,8 +44,8 @@ node --test 03-test-suite/receipts.test.mjs
 ## Hints
 
 - **Start and stop the servers.** [`before(fn)` and `after(fn)`][hooks] from `node:test` run `fn` once, before the first test and after the last one in the file. They wait for a promise, like a test does. `listen(0, "127.0.0.1")` asks the operating system for any unused port, so two suites never fight over one. `server.close()` waits for the connections that are still busy, so a call your test leaves hanging keeps it waiting. `server.closeAllConnections()` closes them first.
-- **Fake the tax API.** The fake is an HTTP server you control, like the dependencies in section 1 of [Mocks and fake timers](https://atomicly.dev/lessons/mocks-and-timers), *Fake a dependency with mock.fn*. To make one test's call hang or fail, keep a variable the fake checks, such as a function that gets each call. Reset it when the test ends, with `t.after`, so the next test gets the normal fake. Section 3, *Restore what you replace*, shows why.
-- **The timeout.** A fake that never answers makes the service wait for its deadline, 1.5 seconds. Check what the client gets, not how long it took. Section 1 of [Bounded request handling](https://atomicly.dev/lessons/request-limits), *One deadline for the whole request*, shows the `503`.
+- **Fake the tax API.** The fake is an HTTP server you control, like the dependencies in section 1 of [Mocks and fake timers](https://atomicly.dev/lessons/node-mocks-and-timers), *Fake a dependency with mock.fn*. To make one test's call hang or fail, keep a variable the fake checks, such as a function that gets each call. Reset it when the test ends, with `t.after`, so the next test gets the normal fake. Section 3, *Restore what you replace*, shows why.
+- **The timeout.** A fake that never answers makes the service wait for its deadline, 1.5 seconds. Check what the client gets, not how long it took. Section 1 of [Bounded request handling](https://atomicly.dev/lessons/node-request-limits), *One deadline for the whole request*, shows the `503`.
 - **The client leaves.** Give the client's `fetch` an `AbortController`'s signal, and abort it from inside the fake, when the tax call arrives. Then have the fake answer `503`, which the service retries within 150 ms, and check that no second call came. Section 2 of Bounded request handling, *Stop when the client leaves*, shows what the service does. `fetch` rejects with an `AbortError`, so `await assert.rejects(...)`, as section 3 of [node:test and assert](https://atomicly.dev/lessons/node-test), *Await what you test*, shows.
 - **A test that can't fail.** If your suite passes against a broken copy, read that copy's bug in the lab's message, and ask what your test checks. A test that only checks the status can pass for the wrong reason.
 

@@ -6,9 +6,9 @@ Do them in any order. Each one goes with a lesson:
 
 | Lab | Goal | You edit | Lesson |
 | --- | --- | --- | --- |
-| [01-order-import](01-order-import/) | A nightly import fails on every real night, or never finishes. Make it stream pages, send 5 saves at a time, time out, and report bad orders without stopping. | `importer.mjs` | [Limit how many run at once](https://atomicly.dev/lessons/concurrency-limits) |
-| [02-search-box](02-search-box/) | A search box shows results for an old query, and leaves old requests running. Make it show only the newest search, and stop the ones it replaced. | `search.mjs` | [Cancel work you no longer need](https://atomicly.dev/lessons/cancellation) |
-| [03-memory-leak](03-memory-leak/) | An upload worker's memory grows all week. Find which structures leak with heap snapshots, and fix them. | `worker.mjs` | [Find a memory leak](https://atomicly.dev/lessons/finding-a-leak) |
+| [01-order-import](01-order-import/) | A nightly import fails on every real night, or never finishes. Make it stream pages, send 5 saves at a time, time out, and report bad orders without stopping. | `importer.mjs` | [Limit how many run at once](https://atomicly.dev/lessons/js-concurrency-limits) |
+| [02-search-box](02-search-box/) | A search box shows results for an old query, and leaves old requests running. Make it show only the newest search, and stop the ones it replaced. | `search.mjs` | [Cancel work you no longer need](https://atomicly.dev/lessons/js-cancellation) |
+| [03-memory-leak](03-memory-leak/) | An upload worker's memory grows all week. Find which structures leak with heap snapshots, and fix them. | `worker.mjs` | [Find a memory leak](https://atomicly.dev/lessons/js-finding-a-leak) |
 
 ## Start
 

@@ -25,7 +25,7 @@ const TRACEPARENT = /^00-([0-9a-f]{32})-([0-9a-f]{16})-([0-9a-f]{2})$/;
 
 export default {
   file: "service.mjs",
-  lesson: "https://atomicly.dev/lessons/shutdown-under-load",
+  lesson: "https://atomicly.dev/lessons/node-shutdown-under-load",
 
   async run(ctx) {
     // What the tax API saw: for each receipt, the traceparent of each call.

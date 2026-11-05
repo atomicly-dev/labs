@@ -21,7 +21,7 @@ const MB = 1024 * 1024;
 
 export default {
   file: "worker.mjs",
-  lesson: "https://atomicly.dev/lessons/finding-a-leak",
+  lesson: "https://atomicly.dev/lessons/js-finding-a-leak",
 
   async run({ file, collectGarbage, events }) {
     const loaded = await loadModule(file, ["createUploadWorker"]);

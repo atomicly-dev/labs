@@ -6,9 +6,9 @@ Do them in any order. Each one goes with a lesson:
 
 | Lab | Goal | You edit | Lesson |
 | --- | --- | --- | --- |
-| [01-find-slow-query](01-find-slow-query/) | The shop's database got slow. Find the query that costs it the most time, and fix it. | `fix.sql` | [Finding and fixing slow queries](https://atomicly.dev/lessons/slow-query-workflow) |
-| [02-migration-under-load](02-migration-under-load/) | A migration takes the shop down for 3 seconds. Rewrite it so the app never waits. | `migration.sql` | [Migrations without downtime](https://atomicly.dev/lessons/zero-downtime-migrations) |
-| [03-idempotent-webhook](03-idempotent-webhook/) | A payment webhook counts money twice, and a late event undoes a refund. Make the handler safe to retry. | `handler.mjs` | [Idempotent writes](https://atomicly.dev/lessons/idempotency) |
+| [01-find-slow-query](01-find-slow-query/) | The shop's database got slow. Find the query that costs it the most time, and fix it. | `fix.sql` | [Finding and fixing slow queries](https://atomicly.dev/lessons/psql-slow-query-workflow) |
+| [02-migration-under-load](02-migration-under-load/) | A migration takes the shop down for 3 seconds. Rewrite it so the app never waits. | `migration.sql` | [Migrations without downtime](https://atomicly.dev/lessons/psql-zero-downtime-migrations) |
+| [03-idempotent-webhook](03-idempotent-webhook/) | A payment webhook counts money twice, and a late event undoes a refund. Make the handler safe to retry. | `handler.mjs` | [Idempotent writes](https://atomicly.dev/lessons/psql-idempotency) |
 
 ## Start the database
 

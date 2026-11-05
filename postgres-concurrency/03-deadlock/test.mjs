@@ -4,7 +4,7 @@ import { errorLines } from "../lib/harness.mjs";
 
 export default {
   file: "transfer.sql",
-  lesson: "https://atomicly.dev/lessons/deadlocks",
+  lesson: "https://atomicly.dev/lessons/psql-deadlocks",
   setup: `
     UPDATE accounts SET balance = 50.00 WHERE id IN (1, 2);
   `,

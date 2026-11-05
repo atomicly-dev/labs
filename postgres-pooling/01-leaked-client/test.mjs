@@ -21,7 +21,7 @@ const REQUESTS = [
 
 export default {
   file: "orders.mjs",
-  lesson: "https://atomicly.dev/lessons/connections-and-pools",
+  lesson: "https://atomicly.dev/lessons/psql-connections-and-pools",
   exports: ["getOrder"],
 
   async run({ app, track }) {

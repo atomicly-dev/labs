@@ -28,7 +28,7 @@ const WORKERS = 3;
 
 export default {
   file: "worker.mjs",
-  lesson: "https://atomicly.dev/lessons/idempotency",
+  lesson: "https://atomicly.dev/lessons/psql-idempotency",
 
   async run(ctx) {
     const db = await connectPool(ctx, PRIMARY_URL, "the primary", { max: 4 });

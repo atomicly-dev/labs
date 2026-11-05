@@ -1,6 +1,6 @@
 # Lab 05: Retry storm
 
-Lesson: [Call an API with fetch](https://atomicly.dev/lessons/fetch-api-calls) (section 4, *Retry within a budget*). Also [Retry storms: stop multiplying an outage](https://atomicly.dev/lessons/sd-retry-storms) and [Circuit breaker: stop calling a failing dependency](https://atomicly.dev/lessons/sd-circuit-breaker).
+Lesson: [Call an API with fetch](https://atomicly.dev/lessons/node-fetch-api-calls) (section 4, *Retry within a budget*). Also [Retry storms: stop multiplying an outage](https://atomicly.dev/lessons/sd-retry-storms) and [Circuit breaker: stop calling a failing dependency](https://atomicly.dev/lessons/sd-circuit-breaker).
 
 ## The situation
 

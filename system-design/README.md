@@ -9,8 +9,8 @@ Each lab is an experiment. You break it, measure it, and fix it, in 20 to 40 min
 | [01-find-the-bottleneck](01-find-the-bottleneck/) | Doubling the API's instances brings "too many clients" errors and no more throughput. Size the pools so 4 instances serve every request. | `config.mjs` | [System design: find what breaks first at 10x traffic](https://atomicly.dev/lessons/sd-first-bottleneck) |
 | [02-read-your-own-write](02-read-your-own-write/) | A customer saves their profile, and the page shows the old name, read from a replica. Route the read after a write to the primary. | `profile.mjs` | Module 2, "Consistency and failure" |
 | [03-cache-stampede](03-cache-stampede/) | A hot key expires, and 50 requests run the same slow query at once. Make one miss cost one query. | `product-cache.mjs` | Module 5, "Caching" |
-| [04-kill-the-worker](04-kill-the-worker/) | A worker dies mid-job, the queue redelivers the job, and a customer gets the same email twice. Make the job safe to run twice. | `worker.mjs` | [Idempotent writes](https://atomicly.dev/lessons/idempotency) |
-| [05-retry-storm](05-retry-storm/) | A slow dependency gets 9 calls per checkout from retries at 2 layers. Keep the retries for blips, and stop them in an outage. | `retry.mjs` | [Call an API with fetch](https://atomicly.dev/lessons/fetch-api-calls) |
+| [04-kill-the-worker](04-kill-the-worker/) | A worker dies mid-job, the queue redelivers the job, and a customer gets the same email twice. Make the job safe to run twice. | `worker.mjs` | [Idempotent writes](https://atomicly.dev/lessons/psql-idempotency) |
+| [05-retry-storm](05-retry-storm/) | A slow dependency gets 9 calls per checkout from retries at 2 layers. Keep the retries for blips, and stop them in an outage. | `retry.mjs` | [Call an API with fetch](https://atomicly.dev/lessons/node-fetch-api-calls) |
 | [06-limit-across-replicas](06-limit-across-replicas/) | A limit of 10 requests a minute lets 40 through with 4 instances. Share one count in Redis. | `limiter.mjs` | Module 7, "Bounding failure" |
 
 ## Start the services

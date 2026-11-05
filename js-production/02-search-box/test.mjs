@@ -25,7 +25,7 @@ const LEAVE = "monitor";
 
 export default {
   file: "search.mjs",
-  lesson: "https://atomicly.dev/lessons/cancellation",
+  lesson: "https://atomicly.dev/lessons/js-cancellation",
 
   async run({ file, serve, events }) {
     const loaded = await loadModule(file, ["createSearchBox"]);

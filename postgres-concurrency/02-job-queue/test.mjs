@@ -6,7 +6,7 @@ const WORKERS = ["worker-1", "worker-2", "worker-3", "worker-4"];
 
 export default {
   file: "claim.sql",
-  lesson: "https://atomicly.dev/lessons/row-locks",
+  lesson: "https://atomicly.dev/lessons/psql-row-locks",
   setup: `
     TRUNCATE job_runs, jobs;
     INSERT INTO jobs (id, kind, order_id, status) VALUES

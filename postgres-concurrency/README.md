@@ -6,10 +6,10 @@ Do them in order:
 
 | Lab | Goal | Lesson |
 | --- | --- | --- |
-| [01-lost-update](01-lost-update/) | Two checkouts sell the last Monitors. Make sure stock never goes wrong and no sale is lost. | [Lost updates](https://atomicly.dev/lessons/lost-updates) |
-| [02-job-queue](02-job-queue/) | Several workers take jobs from a queue. Make sure no job runs twice and no worker waits for another. | [Row locks](https://atomicly.dev/lessons/row-locks) |
-| [03-deadlock](03-deadlock/) | Two store-credit transfers go in opposite directions and deadlock. Make them both finish. | [Deadlocks](https://atomicly.dev/lessons/deadlocks) |
-| [04-serialization-retry](04-serialization-retry/) | Two orders use the last use of a coupon. Make sure the coupon isn't used too often. | [Isolation levels](https://atomicly.dev/lessons/isolation-levels) |
+| [01-lost-update](01-lost-update/) | Two checkouts sell the last Monitors. Make sure stock never goes wrong and no sale is lost. | [Lost updates](https://atomicly.dev/lessons/psql-lost-updates) |
+| [02-job-queue](02-job-queue/) | Several workers take jobs from a queue. Make sure no job runs twice and no worker waits for another. | [Row locks](https://atomicly.dev/lessons/psql-row-locks) |
+| [03-deadlock](03-deadlock/) | Two store-credit transfers go in opposite directions and deadlock. Make them both finish. | [Deadlocks](https://atomicly.dev/lessons/psql-deadlocks) |
+| [04-serialization-retry](04-serialization-retry/) | Two orders use the last use of a coupon. Make sure the coupon isn't used too often. | [Isolation levels](https://atomicly.dev/lessons/psql-isolation-levels) |
 
 ## Start the database
 

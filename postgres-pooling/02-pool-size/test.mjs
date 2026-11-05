@@ -11,7 +11,7 @@ const CUSTOMERS = [1, 2, 3, 5, 6, 8];
 
 export default {
   file: "pool.mjs",
-  lesson: "https://atomicly.dev/lessons/connections-and-pools",
+  lesson: "https://atomicly.dev/lessons/psql-connections-and-pools",
   exports: ["createPool", "customerSummary"],
 
   async run({ app, db, track }) {

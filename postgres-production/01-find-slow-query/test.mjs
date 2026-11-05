@@ -58,7 +58,7 @@ const SLOW = QUERIES.orderHistory;
 
 export default {
   file: "fix.sql",
-  lesson: "https://atomicly.dev/lessons/slow-query-workflow",
+  lesson: "https://atomicly.dev/lessons/psql-slow-query-workflow",
 
   async run({ file, db, connect, track }) {
     const read = await readSqlFile(file);

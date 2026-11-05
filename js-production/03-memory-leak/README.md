@@ -1,6 +1,6 @@
 # Lab 03: Memory leak
 
-Lessons: [Find a memory leak](https://atomicly.dev/lessons/finding-a-leak), [Memory leaks in long-running code](https://atomicly.dev/lessons/memory-leaks), and [Listeners and timers that never stop](https://atomicly.dev/lessons/listeners-and-timers)
+Lessons: [Find a memory leak](https://atomicly.dev/lessons/js-finding-a-leak), [Memory leaks in long-running code](https://atomicly.dev/lessons/js-memory-leaks), and [Listeners and timers that never stop](https://atomicly.dev/lessons/js-listeners-and-timers)
 
 ## The situation
 
@@ -55,7 +55,7 @@ The lab passes when:
 
 ## Hints
 
-- **Reading the snapshots.** Sections 3 and 4 of [Find a memory leak](https://atomicly.dev/lessons/finding-a-leak), *Compare two snapshots* and *Follow the retainers to the code*, show how. The end of section 4 explains why a list with a size limit shows up in the retainers but not in # Delta.
-- **The listeners.** Section 1 of [Listeners and timers that never stop](https://atomicly.dev/lessons/listeners-and-timers), *A listener stays in the emitter's list*, shows why a listener on a long-lived emitter keeps what it uses. Section 2, *Node warns after 10 listeners*, explains the warning. Section 3, *To remove a listener, pass the same function*, shows how to remove it, and why `once` doesn't help when the event never comes.
-- **The failed jobs.** Section 2 of [Memory leaks in long-running code](https://atomicly.dev/lessons/memory-leaks), *Delete entries when their work ends*, shows a map that keeps an entry for each job that throws.
+- **Reading the snapshots.** Sections 3 and 4 of [Find a memory leak](https://atomicly.dev/lessons/js-finding-a-leak), *Compare two snapshots* and *Follow the retainers to the code*, show how. The end of section 4 explains why a list with a size limit shows up in the retainers but not in # Delta.
+- **The listeners.** Section 1 of [Listeners and timers that never stop](https://atomicly.dev/lessons/js-listeners-and-timers), *A listener stays in the emitter's list*, shows why a listener on a long-lived emitter keeps what it uses. Section 2, *Node warns after 10 listeners*, explains the warning. Section 3, *To remove a listener, pass the same function*, shows how to remove it, and why `once` doesn't help when the event never comes.
+- **The failed jobs.** Section 2 of [Memory leaks in long-running code](https://atomicly.dev/lessons/js-memory-leaks), *Delete entries when their work ends*, shows a map that keeps an entry for each job that throws.
 - **The cache.** Section 3 of the same lesson, *Give a cache a size limit*, shows how to drop the oldest entry.

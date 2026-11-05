@@ -1,6 +1,6 @@
 # Lab 04: Serialization retry
 
-Lesson: [Isolation levels](https://atomicly.dev/lessons/isolation-levels)
+Lesson: [Isolation levels](https://atomicly.dev/lessons/psql-isolation-levels)
 
 ## The situation
 

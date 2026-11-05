@@ -1,6 +1,6 @@
 # Lab 02: Shutdown and request context
 
-Lessons: [Shutdown under traffic](https://atomicly.dev/lessons/shutdown-under-load), [Logging](https://atomicly.dev/lessons/logging), and [Metrics and traces for an incident](https://atomicly.dev/lessons/metrics-and-traces)
+Lessons: [Shutdown under traffic](https://atomicly.dev/lessons/node-shutdown-under-load), [Logging](https://atomicly.dev/lessons/node-logging), and [Metrics and traces for an incident](https://atomicly.dev/lessons/node-metrics-and-traces)
 
 ## The situation
 
@@ -9,7 +9,7 @@ The receipts service runs in Kubernetes, behind a load balancer, and deploys sev
 1. It saves the file to storage, and asks the tax API for the VAT, with up to 3 tries.
 2. It answers `201`, then starts a background job that writes the receipt to the ledger with `pool.query`.
 
-It logs one JSON line per event, with a `requestId`. On `SIGTERM`, it closes the server, then the pool, as the lesson [Graceful shutdown](https://atomicly.dev/lessons/graceful-shutdown) shows.
+It logs one JSON line per event, with a `requestId`. On `SIGTERM`, it closes the server, then the pool, as the lesson [Graceful shutdown](https://atomicly.dev/lessons/node-graceful-shutdown) shows.
 
 ## What users and on-call see
 
@@ -49,9 +49,9 @@ The top of `service.mjs` lists the shutdown's steps and their deadlines.
 
 ## Hints
 
-- **Fail the readiness check first.** Section 1 of [Shutdown under traffic](https://atomicly.dev/lessons/shutdown-under-load), *New requests arrive after SIGTERM*, shows why uploads still arrive after `SIGTERM`, and how a `/ready` that answers `503` lets the load balancer stop sending. Section 2, *Close the load balancer's connections*, shows the `Connection: close` header for the keep-alive connections.
+- **Fail the readiness check first.** Section 1 of [Shutdown under traffic](https://atomicly.dev/lessons/node-shutdown-under-load), *New requests arrive after SIGTERM*, shows why uploads still arrive after `SIGTERM`, and how a `/ready` that answers `503` lets the load balancer stop sending. Section 2, *Close the load balancer's connections*, shows the `Connection: close` header for the keep-alive connections.
 - **Finish background work, then close the pool.** Section 3, *Finish background work, then close the pool*, shows a `Set` of running jobs, why the handlers go in it too, and the order: the server, then the jobs, then the pool.
 - **Flush telemetry last.** Section 4, *Flush telemetry last*, shows why `telemetry.shutdown()` comes after everything that makes spans.
 - **One deadline for every step.** Section 5, *One deadline for every step*, shows `upTo` and two deadlines that start at `SIGTERM`: one for the requests, the jobs, and the pool, and a later one for the whole shutdown. `r-2004`'s job never finishes, so a shutdown that waits for it without a deadline never ends.
-- **Carry the request ID without passing it.** Section 2 of [Logging](https://atomicly.dev/lessons/logging), *Pass the request ID without passing it*, shows this exact bug, and `AsyncLocalStorage`. Start the handler, and the job it starts, inside `run`, so the job's line carries the ID too.
-- **Pass the trace on.** Section 4 of [Metrics and traces for an incident](https://atomicly.dev/lessons/metrics-and-traces), *Follow one request across services*, shows how to check an incoming `traceparent`, keep its trace ID and flags, make a span ID of your own, and send the header on an outbound call. Keep the trace ID and the span ID in the same store as the request ID, and put the trace ID in each log line.
+- **Carry the request ID without passing it.** Section 2 of [Logging](https://atomicly.dev/lessons/node-logging), *Pass the request ID without passing it*, shows this exact bug, and `AsyncLocalStorage`. Start the handler, and the job it starts, inside `run`, so the job's line carries the ID too.
+- **Pass the trace on.** Section 4 of [Metrics and traces for an incident](https://atomicly.dev/lessons/node-metrics-and-traces), *Follow one request across services*, shows how to check an incoming `traceparent`, keep its trace ID and flags, make a span ID of your own, and send the header on an outbound call. Keep the trace ID and the span ID in the same store as the request ID, and put the trace ID in each log line.

@@ -6,9 +6,9 @@ Do them in order:
 
 | Lab | Goal | Lesson |
 | --- | --- | --- |
-| [01-leaked-client](01-leaked-client/) | After a few failed requests, the API hangs. Make every request give its client back to the pool. | [Connections and pools](https://atomicly.dev/lessons/connections-and-pools) |
-| [02-pool-size](02-pool-size/) | 4 instances of the API run out of PostgreSQL connections. Size the pools so every request succeeds. | [Connections and pools](https://atomicly.dev/lessons/connections-and-pools) |
-| [03-transaction-pooling](03-transaction-pooling/) | Behind PgBouncer, customers see each other's orders. Make each request see only its own customer. | [PgBouncer and transaction pooling](https://atomicly.dev/lessons/pgbouncer-modes) |
+| [01-leaked-client](01-leaked-client/) | After a few failed requests, the API hangs. Make every request give its client back to the pool. | [Connections and pools](https://atomicly.dev/lessons/psql-connections-and-pools) |
+| [02-pool-size](02-pool-size/) | 4 instances of the API run out of PostgreSQL connections. Size the pools so every request succeeds. | [Connections and pools](https://atomicly.dev/lessons/psql-connections-and-pools) |
+| [03-transaction-pooling](03-transaction-pooling/) | Behind PgBouncer, customers see each other's orders. Make each request see only its own customer. | [PgBouncer and transaction pooling](https://atomicly.dev/lessons/psql-pgbouncer-modes) |
 
 ## Start the database
 

@@ -1,6 +1,6 @@
 # Lab 01: Find the bottleneck
 
-Lessons: [System design: find what breaks first at 10x traffic](https://atomicly.dev/lessons/sd-first-bottleneck) and [Connections and pools](https://atomicly.dev/lessons/connections-and-pools)
+Lessons: [System design: find what breaks first at 10x traffic](https://atomicly.dev/lessons/sd-first-bottleneck) and [Connections and pools](https://atomicly.dev/lessons/psql-connections-and-pools)
 
 ## The situation
 

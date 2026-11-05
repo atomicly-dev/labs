@@ -1,6 +1,6 @@
 # Lab 01: Leaked client
 
-Lesson: [Connections and pools](https://atomicly.dev/lessons/connections-and-pools)
+Lesson: [Connections and pools](https://atomicly.dev/lessons/psql-connections-and-pools)
 
 ## The situation
 

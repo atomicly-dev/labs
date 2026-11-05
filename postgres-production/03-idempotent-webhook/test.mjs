@@ -42,7 +42,7 @@ const PAYMENT_ONLY = [...DUPLICATED, CUT_OFF];
 
 export default {
   file: "handler.mjs",
-  lesson: "https://atomicly.dev/lessons/idempotency",
+  lesson: "https://atomicly.dev/lessons/psql-idempotency",
 
   async run({ file, db, track }) {
     const loaded = await loadModule(file, ["handlePaymentWebhook"]);

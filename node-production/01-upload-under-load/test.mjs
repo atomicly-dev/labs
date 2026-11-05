@@ -24,7 +24,7 @@ const VAT_RATES = { DE: 0.19, FR: 0.2 };
 
 export default {
   file: "service.mjs",
-  lesson: "https://atomicly.dev/lessons/request-limits",
+  lesson: "https://atomicly.dev/lessons/node-request-limits",
 
   async run(ctx) {
     // What the tax API saw, per receipt.

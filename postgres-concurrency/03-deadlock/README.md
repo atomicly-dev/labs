@@ -1,6 +1,6 @@
 # Lab 03: Deadlock
 
-Lesson: [Deadlocks](https://atomicly.dev/lessons/deadlocks)
+Lesson: [Deadlocks](https://atomicly.dev/lessons/psql-deadlocks)
 
 ## The situation
 

@@ -1,6 +1,6 @@
 # Lab 03: Transaction pooling
 
-Lesson: [PgBouncer and transaction pooling](https://atomicly.dev/lessons/pgbouncer-modes)
+Lesson: [PgBouncer and transaction pooling](https://atomicly.dev/lessons/psql-pgbouncer-modes)
 
 ## The situation
 

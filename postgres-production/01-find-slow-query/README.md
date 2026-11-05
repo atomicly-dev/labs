@@ -1,6 +1,6 @@
 # Lab 01: Find the slow query
 
-Lesson: [Finding and fixing slow queries](https://atomicly.dev/lessons/slow-query-workflow)
+Lesson: [Finding and fixing slow queries](https://atomicly.dev/lessons/psql-slow-query-workflow)
 
 ## The situation
 

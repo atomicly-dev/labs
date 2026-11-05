@@ -11,7 +11,7 @@ const CUSTOMERS = [1, 2, 3, 4, 5, 6, 8]; // Customer 4 has no orders.
 
 export default {
   file: "my-orders.mjs",
-  lesson: "https://atomicly.dev/lessons/pgbouncer-modes",
+  lesson: "https://atomicly.dev/lessons/psql-pgbouncer-modes",
   exports: ["listMyOrders"],
 
   async run({ app, db, track }) {

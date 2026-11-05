@@ -1,6 +1,6 @@
 # Lab 02: Job queue
 
-Lesson: [Row locks](https://atomicly.dev/lessons/row-locks)
+Lesson: [Row locks](https://atomicly.dev/lessons/psql-row-locks)
 
 ## The situation
 

@@ -19,7 +19,7 @@ const MAX_CALLS_PER_CHECKOUT = 1.5;
 
 export default {
   file: "retry.mjs",
-  lesson: "https://atomicly.dev/lessons/fetch-api-calls",
+  lesson: "https://atomicly.dev/lessons/node-fetch-api-calls",
 
   async run(ctx) {
     // The same file, imported twice, the way two processes would load it.

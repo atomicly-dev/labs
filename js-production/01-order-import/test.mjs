@@ -36,7 +36,7 @@ const SHOULD_FAIL = [...INVALID.keys(), HUNG].sort();
 
 export default {
   file: "importer.mjs",
-  lesson: "https://atomicly.dev/lessons/concurrency-limits",
+  lesson: "https://atomicly.dev/lessons/js-concurrency-limits",
 
   async run({ file, serve }) {
     const loaded = await loadModule(file, ["importOrders"]);
