@@ -1,0 +1,66 @@
+name: atomicly-labs-recovery
+
+# Two PostgreSQL 18 servers: production, which archives its WAL, and a new server beside it, where
+# you restore. Everything lives in memory: the data, production's WAL archive, and its base
+# backups. So `docker compose down` throws it all away, and the next `up` starts from the seed.
+
+services:
+  # The shop's production database. archive_command copies each completed WAL segment to the
+  # archive, and refuses to overwrite a segment that's already there.
+  production:
+    image: postgres:18.6-alpine
+    command:
+      - postgres
+      - -c
+      - archive_mode=on
+      - -c
+      - archive_command=test ! -f /mnt/archive/%f && cp %p /mnt/archive/%f
+    environment:
+      POSTGRES_DB: shop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "127.0.0.1:5446:5432"
+    tmpfs:
+      - /var/lib/postgresql
+    volumes:
+      - ./postgres/seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro
+      - archive:/mnt/archive
+      - backups:/backups
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "postgres", "-d", "shop"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  # The new server, beside production, where you restore. It starts with no database: the test
+  # runs your restore script here, then starts PostgreSQL on what the script put in $PGDATA. It
+  # reads production's WAL archive and base backups, and can't change them.
+  restore:
+    image: postgres:18.6-alpine
+    command: ["sleep", "infinity"]
+    init: true
+    ports:
+      - "127.0.0.1:5447:5432"
+    tmpfs:
+      - /var/lib/postgresql
+    volumes:
+      - .:/labs:ro
+      - archive:/mnt/archive:ro
+      - backups:/backups:ro
+    depends_on:
+      production:
+        condition: service_healthy
+
+# Volumes in memory, which both servers mount. They belong to the image's postgres user, uid 70.
+volumes:
+  archive:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: uid=70,gid=70,mode=0700
+  backups:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: uid=70,gid=70,mode=0700
