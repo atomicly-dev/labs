@@ -24,12 +24,19 @@ export default {
     const primaryPool = await connectPool(ctx, PRIMARY_URL, "the primary", { max: 4 });
     const replicaPool = await connectPool(ctx, REPLICA_URL, "the replica", { max: 4 });
 
-    // Put the names back, and wait until the replica has them too.
-    await primaryPool.query(
-      `UPDATE profiles SET display_name = CASE id WHEN 1 THEN 'Ann' WHEN 2 THEN 'Bilal' ELSE 'Chen' END`,
+    // Put the names back, and wait until the replica has applied this reset. Checking the name alone
+    // isn't enough: right after a run, the replica can still show "Ann" from before that run's
+    // "Ann Lee", then apply "Ann Lee" while this run reads. The reset's updated_at marks this reset.
+    const { rows: reset } = await primaryPool.query(
+      `UPDATE profiles SET display_name = CASE id WHEN 1 THEN 'Ann' WHEN 2 THEN 'Bilal' ELSE 'Chen' END,
+         updated_at = clock_timestamp()
+       RETURNING id, updated_at`,
     );
+    const resetAt = reset.find((row) => row.id === 1).updated_at.getTime();
     const deadline = Date.now() + 10_000;
-    while ((await replicaPool.query("SELECT display_name FROM profiles WHERE id = 1")).rows[0].display_name !== "Ann") {
+    for (;;) {
+      const { rows } = await replicaPool.query("SELECT display_name, updated_at FROM profiles WHERE id = 1");
+      if (rows[0].display_name === "Ann" && rows[0].updated_at.getTime() === resetAt) break;
       if (Date.now() > deadline) return ["The replica didn't catch up with the primary within 10 seconds. Run `docker compose logs replica`."];
       await sleep(100);
     }
